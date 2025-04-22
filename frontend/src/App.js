@@ -208,6 +208,10 @@ function App() {
                       src={template.preview_url} 
                       alt={`${template.name} template`}
                       className="w-full h-full object-cover hover:scale-105 transition-transform"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.parentElement.innerHTML = `<div class="flex items-center justify-center h-full"><span class="text-2xl text-gray-500">${template.name}</span></div>`;
+                      }}
                     />
                   </div>
                   <div className="p-4">
