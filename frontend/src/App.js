@@ -9,35 +9,35 @@ const TEMPLATES = [
     id: "landing-page",
     name: "Landing Page",
     description: "A sleek single-page website perfect for showcasing your product or service",
-    preview_url: "/templates/landing-page.png",
+    preview_url: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1050&q=80",
     type: "landing"
   },
   {
     id: "multi-page",
     name: "Multi-Page Website",
     description: "A complete website with navigation menu and multiple pages",
-    preview_url: "/templates/multi-page.png",
+    preview_url: "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1050&q=80",
     type: "multi-page"
   },
   {
     id: "portfolio",
     name: "Portfolio",
     description: "Showcase your work with this elegant portfolio template",
-    preview_url: "/templates/portfolio.png",
+    preview_url: "https://images.unsplash.com/photo-1558655146-d09347e92766?ixlib=rb-4.0.3&auto=format&fit=crop&w=1050&q=80",
     type: "portfolio"
   },
   {
     id: "blog",
     name: "Blog",
     description: "Share your thoughts with a clean, reader-friendly blog design",
-    preview_url: "/templates/blog.png",
+    preview_url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&auto=format&fit=crop&w=1050&q=80",
     type: "blog"
   },
   {
     id: "dashboard",
     name: "Dashboard",
     description: "Data-focused layout ideal for analytics and reporting",
-    preview_url: "/templates/dashboard.png",
+    preview_url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1050&q=80",
     type: "dashboard"
   }
 ];
