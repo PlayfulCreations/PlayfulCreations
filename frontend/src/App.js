@@ -105,15 +105,6 @@ function App() {
     setError(null);
 
     try {
-      // In a real implementation, we would call the backend
-      // For demo purposes, we'll simulate the response
-      setTimeout(() => {
-        setAiPrompt("");
-        setIsLoading(false);
-      }, 1500);
-
-      // Actual API call would look like this:
-      /*
       const response = await fetch(`${BACKEND_URL}/api/customize`, {
         method: 'POST',
         headers: {
@@ -126,14 +117,18 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to customize website');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to customize website');
       }
 
       const data = await response.json();
-      // Handle the response
+      
+      // Show a success message or update the preview
+      alert(`Changes applied: ${data.message}`);
+      
+      // Clear the prompt field
       setAiPrompt("");
       setIsLoading(false);
-      */
     } catch (err) {
       setError(err.message || 'An error occurred');
       setIsLoading(false);
