@@ -182,7 +182,8 @@ async def get_website_preview(website_id: str):
         "website_id": website_id,
         "template_id": website.get("template_id"),
         "notion_page_id": website.get("notion_page_id"),
-        "status": website.get("status")
+        "status": website.get("status"),
+        "content": website.get("content", {})
     }
 
 @app.on_event("shutdown")
