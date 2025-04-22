@@ -305,8 +305,41 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
                 <div className="bg-gray-800 rounded-lg overflow-hidden">
-                  <div className="h-96 bg-gray-700 flex items-center justify-center">
-                    <span className="text-2xl text-gray-500">Website Preview</span>
+                  <div className="p-8 bg-gray-700">
+                    {websiteData.content ? (
+                      <div className="bg-white text-gray-900 rounded-lg p-6 mx-auto max-w-4xl min-h-[400px] shadow-lg">
+                        <h1 className="text-3xl font-bold mb-6">{websiteData.content.title || "My Website"}</h1>
+                        
+                        {websiteData.content.blocks && websiteData.content.blocks.map((block, index) => {
+                          switch(block.type) {
+                            case "heading":
+                              return <h2 key={index} className="text-2xl font-semibold my-4">{block.content}</h2>
+                            case "paragraph":
+                              return <p key={index} className="my-3">{block.content}</p>
+                            case "image":
+                              return (
+                                <div key={index} className="my-6">
+                                  <img 
+                                    src={block.url} 
+                                    alt="Content" 
+                                    className="rounded-lg max-w-full mx-auto"
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = "https://images.unsplash.com/photo-1499750310107-5fef28a66643";
+                                    }}
+                                  />
+                                </div>
+                              )
+                            default:
+                              return <p key={index}>{block.content}</p>
+                          }
+                        })}
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-96">
+                        <span className="text-2xl text-gray-500">Loading website preview...</span>
+                      </div>
+                    )}
                   </div>
                   <div className="p-5">
                     <h3 className="text-2xl font-semibold mb-2">Your Generated Website</h3>
