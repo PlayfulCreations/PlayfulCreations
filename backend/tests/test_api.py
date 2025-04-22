@@ -1,102 +1,98 @@
 import pytest
-import requests
+import httpx
 import os
 from dotenv import load_dotenv
-import logging
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
 
-# Get the backend URL from environment
+# Get the backend URL from environment variable
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:8001')
 
 class TestNotionToWebsiteAPI:
     def setup_method(self):
+        """Setup test client"""
         self.base_url = BACKEND_URL
-        logger.info(f"Testing against backend URL: {self.base_url}")
+        self.client = httpx.Client(base_url=self.base_url)
+        self.test_notion_url = "https://www.notion.so/myworkspace/My-Page-123456789"
+        self.test_template_id = "landing-page"
 
     def test_get_templates(self):
-        """Test retrieving templates"""
-        response = requests.get(f"{self.base_url}/api/templates")
+        """Test getting available templates"""
+        response = self.client.get("/api/templates")
         assert response.status_code == 200
         data = response.json()
         assert "templates" in data
         templates = data["templates"]
         assert len(templates) > 0
         assert all(key in templates[0] for key in ["id", "name", "description", "preview_url", "type"])
-        logger.info("✅ Templates API test passed")
 
     def test_convert_notion_page(self):
-        """Test converting a Notion page"""
-        test_data = {
-            "page_id": "test-page-123",
-            "template_id": "landing-page",
-            "notion_token": "test-token"
+        """Test converting a Notion page to website"""
+        payload = {
+            "page_id": self.test_notion_url,
+            "template_id": self.test_template_id
         }
-        response = requests.post(f"{self.base_url}/api/convert", json=test_data)
+        response = self.client.post("/api/convert", json=payload)
         assert response.status_code == 200
         data = response.json()
         assert "website_id" in data
         assert "status" in data
         assert "preview_url" in data
         assert data["status"] == "created"
-        logger.info("✅ Convert API test passed")
-        return data["website_id"]
-
-    def test_ai_customization(self):
-        """Test AI customization"""
-        # First create a website
-        website_id = self.test_convert_notion_page()
         
-        test_data = {
-            "website_id": website_id,
-            "prompt": "Make the design more modern"
+        # Store website_id for other tests
+        self.website_id = data["website_id"]
+
+    def test_customize_website(self):
+        """Test AI customization of website"""
+        # First create a website
+        payload = {
+            "page_id": self.test_notion_url,
+            "template_id": self.test_template_id
         }
-        response = requests.post(f"{self.base_url}/api/customize", json=test_data)
-        assert response.status_code == 200
-        data = response.json()
-        assert data["website_id"] == website_id
-        assert "status" in data
-        assert data["status"] == "updated"
-        logger.info("✅ AI Customization API test passed")
+        response = self.client.post("/api/convert", json=payload)
+        website_id = response.json()["website_id"]
 
-    def test_website_preview(self):
-        """Test website preview"""
-        # First create a website
-        website_id = self.test_convert_notion_page()
-        
-        response = requests.get(f"{self.base_url}/api/preview/{website_id}")
+        # Now test customization
+        customize_payload = {
+            "website_id": website_id,
+            "prompt": "Make the header bigger"
+        }
+        response = self.client.post("/api/customize", json=customize_payload)
         assert response.status_code == 200
         data = response.json()
         assert data["website_id"] == website_id
-        assert "template_id" in data
+        assert "message" in data
+        assert data["status"] == "updated"
+
+    def test_get_website_preview(self):
+        """Test getting website preview"""
+        # First create a website
+        payload = {
+            "page_id": self.test_notion_url,
+            "template_id": self.test_template_id
+        }
+        response = self.client.post("/api/convert", json=payload)
+        website_id = response.json()["website_id"]
+
+        # Now get preview
+        response = self.client.get(f"/api/preview/{website_id}")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["website_id"] == website_id
+        assert data["template_id"] == self.test_template_id
         assert "content" in data
         assert "status" in data
-        logger.info("✅ Preview API test passed")
 
-    def test_invalid_website_preview(self):
-        """Test invalid website preview"""
-        response = requests.get(f"{self.base_url}/api/preview/nonexistent-id")
+    def test_get_website_preview_not_found(self):
+        """Test getting preview for non-existent website"""
+        response = self.client.get("/api/preview/nonexistent")
         assert response.status_code == 404
-        logger.info("✅ Invalid preview API test passed")
+
+    def teardown_method(self):
+        """Cleanup after tests"""
+        self.client.close()
 
 if __name__ == "__main__":
-    # Create test instance
-    tester = TestNotionToWebsiteAPI()
-    tester.setup_method()
-
-    # Run all tests
-    try:
-        tester.test_get_templates()
-        tester.test_convert_notion_page()
-        tester.test_ai_customization()
-        tester.test_website_preview()
-        tester.test_invalid_website_preview()
-        logger.info("🎉 All API tests passed successfully!")
-    except Exception as e:
-        logger.error(f"❌ Tests failed: {str(e)}")
-        raise
+    pytest.main([__file__])
