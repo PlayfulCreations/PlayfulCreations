@@ -90,7 +90,24 @@ function App() {
       }
 
       const data = await response.json();
-      setWebsiteData(data);
+      
+      // Fetch the preview data immediately after generation
+      if (data.website_id) {
+        const previewResponse = await fetch(`${BACKEND_URL}/api/preview/${data.website_id}`);
+        
+        if (previewResponse.ok) {
+          const previewData = await previewResponse.json();
+          setWebsiteData({
+            ...data,
+            content: previewData.content
+          });
+        } else {
+          setWebsiteData(data);
+        }
+      } else {
+        setWebsiteData(data);
+      }
+      
       setIsLoading(false);
       setStep("preview");
     } catch (err) {
