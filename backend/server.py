@@ -103,22 +103,43 @@ async def get_templates():
 @app.post("/api/convert")
 async def convert_notion_page(request: NotionPageRequest):
     try:
-        # In a real implementation, we would:
-        # 1. Authenticate with Notion API using the token
-        # 2. Fetch the page content
-        # 3. Convert to website format
-        # 4. Save to database
-        # 5. Return website ID
+        # Extract page ID from URL if needed
+        page_id = request.page_id
+        if "notion.so/" in page_id:
+            # Extract the actual page ID from the URL
+            # Example URL: https://www.notion.so/myworkspace/My-Page-123456789
+            parts = page_id.split("notion.so/")
+            if len(parts) > 1:
+                page_id = parts[1].split("/")[-1].split("-")[-1]
         
-        # For now, we'll mock the response
-        website_id = f"website_{request.page_id[:8]}"
+        logger.info(f"Converting Notion page: {page_id}")
         
-        # Save request to database
+        # In a real implementation, we would use the Notion API with token
+        if request.notion_token:
+            logger.info("Using provided Notion token for authentication")
+            # This would be where we authenticate with the token
+        
+        # Generate a unique website ID
+        import uuid
+        website_id = f"website_{uuid.uuid4().hex[:8]}"
+        
+        # Mock content fetching - in real implementation, we would fetch from Notion API
+        mock_content = {
+            "title": "My Notion Page",
+            "blocks": [
+                {"type": "heading", "content": "Welcome to my website"},
+                {"type": "paragraph", "content": "This website was generated from a Notion page"},
+                {"type": "image", "url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643"}
+            ]
+        }
+        
+        # Save request and mock content to database
         await db.websites.insert_one({
             "website_id": website_id,
-            "notion_page_id": request.page_id,
+            "notion_page_id": page_id,
             "template_id": request.template_id,
-            "status": "created"
+            "status": "created",
+            "content": mock_content
         })
         
         return {
