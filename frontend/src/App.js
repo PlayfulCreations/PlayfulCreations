@@ -203,8 +203,12 @@ function App() {
                   className="bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-yellow-400 transition-all"
                   onClick={() => handleTemplateSelect(template)}
                 >
-                  <div className="h-48 bg-gray-700 flex items-center justify-center">
-                    <span className="text-2xl text-gray-500">Template Preview</span>
+                  <div className="h-48 bg-gray-700 overflow-hidden">
+                    <img 
+                      src={template.preview_url} 
+                      alt={`${template.name} template`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform"
+                    />
                   </div>
                   <div className="p-4">
                     <h3 className="text-xl font-semibold mb-2">{template.name}</h3>
