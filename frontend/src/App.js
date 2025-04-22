@@ -71,20 +71,7 @@ function App() {
     setError(null);
 
     try {
-      // In a real implementation, we would call the backend
-      // For demo purposes, we'll simulate the response
-      setTimeout(() => {
-        setWebsiteData({
-          website_id: `website_${Math.random().toString(36).substring(2, 10)}`,
-          status: "created",
-          preview_url: `/preview/${Math.random().toString(36).substring(2, 10)}`
-        });
-        setIsLoading(false);
-        setStep("preview");
-      }, 2000);
-
-      // Actual API call would look like this:
-      /*
+      // Call the backend API to convert Notion page to website
       const response = await fetch(`${BACKEND_URL}/api/convert`, {
         method: 'POST',
         headers: {
@@ -93,19 +80,19 @@ function App() {
         body: JSON.stringify({
           page_id: notionPageId,
           template_id: selectedTemplate.id,
-          notion_token: notionToken
+          notion_token: notionToken || undefined
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate website');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to generate website');
       }
 
       const data = await response.json();
       setWebsiteData(data);
       setIsLoading(false);
       setStep("preview");
-      */
     } catch (err) {
       setError(err.message || 'An error occurred');
       setIsLoading(false);
